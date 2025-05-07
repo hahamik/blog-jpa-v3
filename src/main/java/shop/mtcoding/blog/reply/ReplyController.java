@@ -18,14 +18,14 @@ public class ReplyController {
     private final ReplyService replyService;
     private final HttpSession session;
 
-    @DeleteMapping("/reply/{id}")
+    @DeleteMapping("/s/api/reply/{id}")
     public @ResponseBody Resp<?> delete(@PathVariable("id") Integer id) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         replyService.댓글삭제(id, sessionUser.getId());
         return Resp.ok(null);
     }
 
-    @PostMapping("/reply")
+    @PostMapping("/s/api/reply")
     public @ResponseBody Resp<?> save(@Valid ReplyRequest.SaveDTO reqDTO, Errors errors) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         ReplyResponse.DTO respDTO = replyService.댓글쓰기(reqDTO, sessionUser);
