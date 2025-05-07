@@ -6,36 +6,41 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Repository
 public class BoardRepository {
     private final EntityManager em;
 
-    public void deleteById(Integer id) {
-        em.createQuery("delete from Board b where b.id = :id")
-                .setParameter("id", id)
-                .executeUpdate();
+    public Optional<Board> findByIdJoinUserAndReplies(Integer id) {
+        try {
+            Query query = em.createQuery("select b from Board b join fetch b.user left join fetch b.replies r left join fetch r.user where b.id = :id order by r.id desc", Board.class);
+            query.setParameter("id", id);
+            Board boardPS = (Board) query.getSingleResult();
+            return Optional.of(boardPS);
+        } catch (RuntimeException e) {
+            return Optional.ofNullable(null);
+        }
+
     }
 
-    public Board findByIdJoinUserAndReplies(Integer id) {
-        Query query = em.createQuery("select b from Board b join fetch b.user left join fetch b.replies r left join fetch r.user where b.id = :id order by r.id desc", Board.class);
-        query.setParameter("id", id);
-        return (Board) query.getSingleResult();
+    public Optional<Board> findByIdJoinUser(Integer id) {
+        try {
+            Query query = em.createQuery("select b from Board b join fetch b.user where b.id = :id", Board.class);
+            query.setParameter("id", id);
+            Board boardPS = (Board) query.getSingleResult();
+            return Optional.of(boardPS);
+        } catch (RuntimeException e) {
+            return Optional.ofNullable(null);
+        }
     }
 
-    public Board findByIdJoinUser(Integer id) {
-        Query query = em.createQuery("select b from Board b join fetch b.user where b.id = :id", Board.class);
-        query.setParameter("id", id);
-        return (Board) query.getSingleResult();
+    public Optional<Board> findById(Integer id) {
+        Board boardPS = em.find(Board.class, id);
+        return Optional.ofNullable(boardPS);
     }
 
-    public Board findById(Integer id) {
-        return em.find(Board.class, id);
-    }
-
-    // 그룹 함수 : Long 리턴
-    // 1. 로그인 안 했을 때 : 4개
     public Long totalCount(String keyword) {
         String sql;
         if (!(keyword.isBlank()))
@@ -46,8 +51,6 @@ public class BoardRepository {
         return (Long) query.getSingleResult();
     }
 
-    // 2-1. ssar로 로그인 했을 때 : 5개
-    // 2-2. cos로 로그인 했을 때 : 4개
     public Long totalCount(int userId, String keyword) {
         String sql;
         if (!(keyword.isBlank()))
@@ -59,7 +62,6 @@ public class BoardRepository {
         return (Long) query.getSingleResult();
     }
 
-    // locahost:8080?page=0
     public List<Board> findAll(int page, String keyword) {
         String sql;
 
@@ -114,5 +116,11 @@ public class BoardRepository {
     public Board save(Board board) {
         em.persist(board);
         return board;
+    }
+
+    public void deleteById(Integer id) {
+        em.createQuery("delete from Board b where b.id = :id")
+                .setParameter("id", id)
+                .executeUpdate();
     }
 }

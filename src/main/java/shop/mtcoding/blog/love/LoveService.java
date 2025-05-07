@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import shop.mtcoding.blog._core.error.ex.ExceptionApi403;
 import shop.mtcoding.blog._core.error.ex.ExceptionApi404;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
 public class LoveService {
@@ -20,9 +22,7 @@ public class LoveService {
 
     @Transactional
     public LoveResponse.DeleteDTO 좋아요취소(Integer id, Integer sessionUserId) {
-        Love lovePS = loveRepository.findById(id);
-
-        if (lovePS == null) throw new ExceptionApi404("자원을 찾을 수 없습니다");
+        Love lovePS = loveRepository.findById(id).orElseThrow(() -> new ExceptionApi404("자원을 찾을 수 없습니다"));
 
         if (!lovePS.getUser().getId().equals(sessionUserId)) {
             throw new ExceptionApi403("권한이 없습니다");

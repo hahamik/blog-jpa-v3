@@ -5,6 +5,8 @@ import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Repository
 public class LoveRepository {
@@ -18,12 +20,12 @@ public class LoveRepository {
         return count;
     }
 
-    public Love findByUserIdAndBoardId(Integer userId, Integer boardId) {
+    public Optional<Love> findByUserIdAndBoardId(Integer userId, Integer boardId) {
         Query query = em.createQuery("select lo from Love lo where lo.user.id = :userId and lo.board.id = :boardId", Love.class);
         query.setParameter("userId", userId);
         query.setParameter("boardId", boardId);
         try {
-            return (Love) query.getSingleResult();
+            return Optional.of((Love) query.getSingleResult());
         } catch (Exception e) {
             return null;
         }
@@ -40,7 +42,7 @@ public class LoveRepository {
         query.executeUpdate();
     }
 
-    public Love findById(Integer id) {
-        return em.find(Love.class, id);
+    public Optional<Love> findById(Integer id) {
+        return Optional.ofNullable(em.find(Love.class, id));
     }
 }
