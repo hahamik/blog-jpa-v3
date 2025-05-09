@@ -50,6 +50,18 @@
 - DTO 전환 (Service 레이어 - Stream API, Optional)
 - RestAPI 주소 설계 (Post, Get, Put, Delete) -> 뷰를 삭제
 - JWT 인증 체계 변경 (jSessionId 사용안함)
+- ```text
+1. UTF-8
+2. JSON
+3. Base64
+4. 대칭키, 공개키(Hash, 전자서명)
+5. 엑세스토큰
+6. 리플래시토큰
+7. 토큰 보안 및 탈취
+8. 레디스 (메모리 세션)
+9. 서버 확장성 (AWS 배우고)
+10. OAuth2.0과 OIDC
+```
 - CORS (Cross Origin Resource Sharing) -> 모든 서버는 JS요청을 거부한다.
 - 통합 테스트 (DS-C-S-R-PC-DB)
 - API 문서 만들기
