@@ -26,4 +26,9 @@ public class Resp<T> {
         Resp<?> resp = new Resp<>(status.value(), msg, null);
         return new ResponseEntity<>(resp, status);
     }
+
+    public static Resp<?> fail(Integer status, String msg) { // 스프링 도움 안받을때!!
+        Resp<?> resp = new Resp<>(status, msg, null);
+        return resp;
+    }
 }
