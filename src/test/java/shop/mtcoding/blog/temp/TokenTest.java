@@ -35,7 +35,7 @@ public class TokenTest {
     @Test
     public void verify_test(){
         // 2025.05.09.11:50까지만 유효함
-        String jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJibG9ndjMiLCJpZCI6MSwiZXhwIjoxNzQ2NzU5MDkyLCJ1c2VybmFtZSI6InNzYXIifQ.WwyAp0wOVnojgxKMlxj-Y2-IPG04mBzE2B4ovM-gaVQ";
+        String jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJibG9ndjMiLCJpZCI6MSwiZXhwIjoxNzQ2NzgzODQ3LCJ1c2VybmFtZSI6InNzYXIifQ.uSwhA0q6P3lSEVeogaCbkE9JSaomtWI7f8Qb_mWBJt4";
 
         DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256("metacoding")).build().verify(jwt); // 맞는지 검증하고 -> 만료되었는지 확인
         Integer id = decodedJWT.getClaim("id").asInt();
