@@ -25,9 +25,10 @@ public class LoveRepository {
         query.setParameter("userId", userId);
         query.setParameter("boardId", boardId);
         try {
-            return Optional.of((Love) query.getSingleResult());
+            Love lovePs = (Love) query.getSingleResult();
+            return Optional.of(lovePs);
         } catch (Exception e) {
-            return null;
+            return Optional.ofNullable(null);
         }
     }
 
