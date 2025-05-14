@@ -16,16 +16,15 @@ public class LoveController {
     private final HttpSession session;
 
     @PostMapping("/s/api/love")
-    public ResponseEntity<?> saveLove(@RequestBody @Valid LoveRequest.SaveDTO reqDTO, Errors errors) {
+    public ResponseEntity<?> save(@RequestBody @Valid LoveRequest.SaveDTO reqDTO, Errors errors) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         LoveResponse.SaveDTO respDTO = loveService.좋아요(reqDTO, sessionUser.getId());
-
         return Resp.ok(respDTO);
     }
 
 
     @DeleteMapping("/s/api/love/{id}")
-    public ResponseEntity<?> deleteLove(@PathVariable("id") Integer id) {
+    public ResponseEntity<?> delete(@PathVariable("id") Integer id) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         LoveResponse.DeleteDTO respDTO = loveService.좋아요취소(id, sessionUser.getId());
 

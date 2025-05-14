@@ -8,12 +8,15 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.mtcoding.blog._core.util.JwtUtil;
 import shop.mtcoding.blog._core.util.Resp;
 import shop.mtcoding.blog.user.User;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+
 
 public class AuthorizationFilter implements Filter {
     @Override
@@ -32,7 +35,7 @@ public class AuthorizationFilter implements Filter {
 
             User user = JwtUtil.verify(accessToken);
 
-            // 토큰을 다시 검증하기 귀찮아서, 임시로 세션에 넣어둔거다.
+            // 토큰 재검증 회피를 위한 임시 저장용 session
             HttpSession session = request.getSession();
             session.setAttribute("sessionUser", user);
 
@@ -47,8 +50,11 @@ public class AuthorizationFilter implements Filter {
             e3.printStackTrace();
             exResponse(response, e3.getMessage());
         }
+
+
     }
 
+    // Filter - DS를 거치지 않고 바로 Tomcat으로 가기 때문에 직접 ResponseEntity를 꺼내줘야 함
     private void exResponse(HttpServletResponse response, String msg) throws IOException {
         response.setContentType("application/json;charset=utf-8");
         response.setStatus(401);

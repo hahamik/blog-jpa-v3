@@ -1,6 +1,7 @@
 package shop.mtcoding.blog.integre;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,7 @@ import shop.mtcoding.blog._core.util.JwtUtil;
 import shop.mtcoding.blog.user.User;
 import shop.mtcoding.blog.user.UserRequest;
 
+@Transactional
 @AutoConfigureMockMvc // MockMvc 클래스가 IOC에 로드
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK) // 메모리에 다띄우고 test 뒤에 설정을 mock 이 아니라 RANDOM_PORT 를 쓰면 랜덤으로 진짜 띄움 디파인 포트는 내가 정해서 띄움
 public class UserControllerTest {
@@ -162,5 +164,7 @@ public class UserControllerTest {
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.id").value(4));
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.username").value("haha"));
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.email").value("haha@gmail.com"));
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.createdAt")
+                .value(Matchers.matchesPattern("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d+$")));
     }
 }

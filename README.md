@@ -82,3 +82,50 @@
 - h2
 - MySQL
 - Mustache
+
+
+create database blogdb;
+
+use blogdb;
+
+create table user_tb (
+    id integer auto_increment,
+    created_at timestamp(6),
+    email varchar(255),
+    password varchar(255),
+    username varchar(255) unique,
+    primary key (id)
+) character set utf8mb4 collate utf8mb4_general_ci;
+
+create table board_tb (
+    id integer auto_increment,
+    is_public boolean,
+    user_id integer,
+    created_at timestamp(6),
+    content varchar(255),
+    title varchar(255),
+    primary key (id),
+    foreign key (user_id) references user_tb(id)
+) character set utf8mb4 collate utf8mb4_general_ci;
+
+create table love_tb (
+    id integer auto_increment,
+    board_id integer,
+    user_id integer,
+    created_at timestamp(6),
+    primary key (id),
+    unique (user_id, board_id),
+    foreign key (board_id) references board_tb(id),
+    foreign key (user_id) references user_tb(id)
+) character set utf8mb4 collate utf8mb4_general_ci;
+
+create table reply_tb (
+    id integer auto_increment,
+    board_id integer,
+    user_id integer,
+    created_at timestamp(6),
+    content varchar(255),
+    primary key (id),
+    foreign key (board_id) references board_tb(id),
+    foreign key (user_id) references user_tb(id)
+) character set utf8mb4 collate utf8mb4_general_ci;

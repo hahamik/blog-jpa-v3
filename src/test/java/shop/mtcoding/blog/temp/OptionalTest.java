@@ -37,8 +37,12 @@ public class OptionalTest {
         String name = "metacoding";
         Optional<String> opt = Optional.ofNullable(name);
 
-        String result = opt.orElseThrow(() ->new RuntimeException("값이 없음"));
-        System.out.println(result);
+        try {
+            String result = opt.orElseThrow(() ->new RuntimeException("값이 없음"));
+            System.out.println(result);
+        }catch (Exception e){
+            System.out.println("괜찮");
+        }
     }
 
     @Test

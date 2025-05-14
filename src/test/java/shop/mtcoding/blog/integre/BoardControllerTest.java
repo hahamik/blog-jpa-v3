@@ -1,6 +1,7 @@
 package shop.mtcoding.blog.integre;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -16,7 +18,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import shop.mtcoding.blog._core.util.JwtUtil;
 import shop.mtcoding.blog.board.BoardRequest;
 import shop.mtcoding.blog.user.User;
+import shop.mtcoding.blog.user.UserRequest;
 
+import static org.hamcrest.Matchers.matchesPattern;
+
+
+@Transactional
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class BoardControllerTest {
@@ -42,6 +49,111 @@ public class BoardControllerTest {
         // 테스트 후 정리할 코드
         System.out.println("tearDown");
     }
+    @Test
+    public void getBoardOne_test() throws Exception {
+        // given
+        Integer id = 1;
+
+        // when
+        ResultActions actions = mvc.perform(
+                MockMvcRequestBuilders
+                        .get("/s/api/board/{id}", id)
+                        .header("Authorization", "Bearer " + accessToken)
+        );
+
+        // eye
+        String responseBody = actions.andReturn().getResponse().getContentAsString();
+        System.out.println(responseBody);
+
+        // then
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200));
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.msg").value("성공"));
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.id").value(1));
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.title").value("제목1"));
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.content").value("내용1"));
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.isPublic").value(true));
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.userId").value(1));
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.createdAt",
+                matchesPattern("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d+")));
+    }
+
+
+    @Test
+    public void getBoardDetail_test() throws Exception {
+        // given
+        Integer boardId = 5;
+
+
+        // when
+        ResultActions actions = mvc.perform(
+                MockMvcRequestBuilders.get("/api/board/{id}/detail", boardId)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // eye
+        String responseBody = actions.andReturn().getResponse().getContentAsString();
+        System.out.println(responseBody);
+
+            // then
+            actions.andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200));
+            actions.andExpect(MockMvcResultMatchers.jsonPath("$.msg").value("성공"));
+            actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.id").value(5));
+            actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.title").value("제목5"));
+            actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.content").value("내용5"));
+            actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.isPublic").value(false));
+            actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.isBoardOwner").value(false));
+            actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.isLove").value(false));
+            actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.loveCount").value(1));
+            actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.username").value("ssar"));
+            actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.createdAt")
+                    .value(matchesPattern("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}\\+00:00$")));
+            actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.loveId").value(Matchers.nullValue()));
+            actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.replies").isArray());
+            actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.replies").isEmpty());
+
+
+        }
+
+    @Test
+    public void update_test()throws Exception{
+        //given
+        Integer userId = 1;
+        Integer boardId = 1;
+        BoardRequest.UpdateDTO reqDTO = new BoardRequest.UpdateDTO();
+        reqDTO.setTitle("===제목===");
+        reqDTO.setContent("===내용===");
+        reqDTO.setIsPublic(false);
+
+        String requestBody = om.writeValueAsString(reqDTO);
+//        System.out.println(requestBody);
+
+        //when
+        ResultActions actions = mvc.perform(
+                MockMvcRequestBuilders
+                        .put("/s/api/board/{id}", boardId)
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + accessToken)
+        );
+
+        //eye
+        String responseBody = actions.andReturn().getResponse().getContentAsString();
+        System.out.println(responseBody);
+
+        //then
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200));
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.msg").value("성공"));
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.id").value(1));
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.title").value("===제목==="));
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.content").value("===내용==="));
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.isPublic").value(false));
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.userId").value(1));
+        actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.createdAt")
+                .value(matchesPattern("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d+$")));
+
+    }
+
+
 
     @Test
     public void save_test() throws Exception {
@@ -67,7 +179,7 @@ public class BoardControllerTest {
         String responseBody = actions.andReturn().getResponse().getContentAsString();
         System.out.println(responseBody);
 
-//        //then 결과 코드로 검증
+        //then 결과 코드로 검증
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200));
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.msg").value("성공"));
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.id").value(21));
@@ -75,7 +187,6 @@ public class BoardControllerTest {
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.content").value("내용21"));
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.isPublic").value(true));
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.userId").value(1));
-
     }
 
     @Test
@@ -106,7 +217,7 @@ public class BoardControllerTest {
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.boards[0].isPublic").value(true));
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.boards[0].userId").value(1));
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.boards[0].createdAt")
-                .value(Matchers.matchesPattern("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d+$")));
+                .value(matchesPattern("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d+$")));
 
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.prev").value(0));
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.next").value(2));
@@ -119,31 +230,4 @@ public class BoardControllerTest {
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.keyword").value("제목1"));
         actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.numbers", Matchers.hasSize(4)));
     }
-
-    @Test
-    public void getBoardDetail_test() throws Exception {
-        // given
-        Integer boardId = 1;
-
-
-        // when
-        ResultActions actions = mvc.perform(
-                MockMvcRequestBuilders.get("/api/board/{id}/detail", boardId)
-                        .contentType(MediaType.APPLICATION_JSON)
-        );
-
-        // eye
-        String responseBody = actions.andReturn().getResponse().getContentAsString();
-        System.out.println(responseBody);
-//
-//        // then
-//        actions.andExpect(MockMvcResultMatchers.jsonPath("$.status").value(200));
-//        actions.andExpect(MockMvcResultMatchers.jsonPath("$.msg").value("성공"));
-//        actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.id").value(20));
-//        actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.title").value("제목20"));
-//        actions.andExpect(MockMvcResultMatchers.jsonPath("$.body.content").value("내용20"));
-
-    }
-
-
 }

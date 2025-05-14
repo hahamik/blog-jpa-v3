@@ -65,8 +65,7 @@ public class BoardService {
         Board boardPS = boardRepository.findByIdJoinUserAndReplies(id)
                 .orElseThrow(() -> new ExceptionApi404("자원을 찾을 수 없습니다"));
 
-        Love love = loveRepository.findByUserIdAndBoardId(userId, id)
-                .orElseThrow(() -> new ExceptionApi404("자원을 찾을 수 없습니다"));
+        Love love = loveRepository.findByUserIdAndBoardId(userId, id).orElse(null);
         Long loveCount = loveRepository.findByBoardId(id);
 
         Integer loveId = love == null ? null : love.getId();
