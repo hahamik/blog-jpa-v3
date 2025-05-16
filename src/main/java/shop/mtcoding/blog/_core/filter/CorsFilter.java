@@ -19,8 +19,8 @@ public class CorsFilter implements Filter {
         String origin = request.getHeader("Origin");
         log.debug("Origin : "+origin);
 
-        response.setHeader("Access-Control-Allow-Origin",  "http://localhost:5000"); // 허용하고자 하는 ip만 열어줌
-//        response.setHeader("Access-Control-Expose-Headers", "Authorization"); // JS로 Authorization라는 KEY 값에 JWT를 넣는걸 허용할지 설정/ 이런 애들 요청오면 응답해줄게 / 응답 여부 결정
+        response.setHeader("Access-Control-Allow-Origin",  "http://127.0.0.1:5000"); // 허용하고자 하는 ip만 열어줌
+//        response.setHeader("Access-Control-Expose-Headers", "Authorization"); 이 헤더 응답을 JS로 접근하게 허용할지
         response.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, DELETE, OPTIONS"); // JS 요청
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Headers", "Origin, X-Key, Content-Type, Accept, Authorization"); // 이런 애들은 요청오면 허용해줄게 / 클라이언트가 요청하는걸 허용하는지 // X-Key -> 커스터마이징 된 애 x를 붙이는게 커벤션임
